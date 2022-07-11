@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backendchat-deployment
+  labels:
+    app: backendchat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backendchat
+  template:
+    metadata:
+      labels:
+        app: backendchat
+    spec:
+      containers:
+      - name: backendchat
+        image: mamateus/backend-chatbot:1.0
+        ports:
+        - containerPort: 8027
+        env:
+        - name: BOT_API_URL_GREETINGS
+          value: "http://ecommerchat-service:30000/greetings"
+        - name: BOT_API_URL_REPLY
+          value: "http://ecommerchat-service:30000/reply"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backendchat-service
+spec:
+  type : NodePort
+  selector:
+    app: backendchat
+  ports:
+    - protocol: TCP
+      port: 8027
+      targetPort: 8027
+      nodePort: 30100
